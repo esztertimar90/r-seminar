@@ -55,14 +55,15 @@ ggsave("graphs/myplot.png")
 # ├── output/                (figures, tables, results)
 # └── docs/                  (markdown files, documents etc.)
 
+# Let's create a new R Project called 'RSeminar' and set up the folder structure
+# 1. In RStudio, go to File > New Project > New Directory > New Project
+# 2. Name your project and choose a location
+# 3. Create folders: data, code, output, docs
 
 
 ## 2) Importing data -----------------------------------------------------------
 # Data can come in a number of formats (e.g., .csv, .dta, .xlsx)
 # There are different functions used to import data from various data formats.
-
-
-
 
 
 # Tidy data, pipe operator
