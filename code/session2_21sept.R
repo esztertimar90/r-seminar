@@ -22,37 +22,38 @@ library(writexl)
   # Check your current working directory
   getwd()
   # Set working directory:
-  setwd()
+  setwd("Users/martinneubrandt/Dropbox/Econometrics")
+    # What is the problem?
 
-#Q: what happens if you move the project you are working in?
+  # Let's make a simple plot and try to save it: 
+randomdata <- rnorm(1000)
+myplot <- ggplot(data.frame(x = randomdata), aes(x = x)) +
+  geom_histogram(bins = 30, fill = "pink", color = "blue") +
+  labs(title = "Histogram of Random Data", x = "Value", y = "Frequency")
+myplot
+ggsave("myplot.png")
+ggsave("graphs/myplot.png")
+
+#Q: what happens if you download the folder to a different computer? Will the code still work? Why or why not?
 
 # Why this matters: R looks for files relative to the working directory
-# If you use setwd(), paths become hardcoded and break when you move the folder
+# If you use setwd(), paths become hardcoded and you need to update it when you move the folder
 
 # BETTER: Use an R Project (.Rproj file)
 # Opening a .Rproj file automatically sets the working directory to the project root
 # This makes paths portable across computers and enables reproducibility
 
-# With an R Project, use relative paths from the project root:
+# With an R Project, you use relative paths from the project root:
 # Example: read.csv("data/raw/file.csv")
 # Instead of: setwd("~/Documents/MyProject"); read.csv("data/file.csv")
 
 # Recommended folder structure:
 # project_root/
 # ├── project_name.Rproj
-# ├── data/raw/              (original, never-modified data)
-# ├── data/processed/        (cleaned data)
+# ├── data/                  (where you store data files)
 # ├── code/                  (R scripts)
 # ├── output/                (figures, tables, results)
-# └── docs/
-
-# Use here() package for safer path construction (handles separators automatically)
-library(here)
-here()  # Shows the project root
-# Then use: read.csv(here("data", "raw", "file.csv"))
-
-
-
+# └── docs/                  (markdown files, documents etc.)
 
 
 
