@@ -17,8 +17,39 @@ library(tidyverse)
 library(wooldridge)
 library(writexl)
 
-## 1) Organizing your work -----------------------------------------------------
-getwd()
+## 1) Organizing your work, paths, and R projects --------------------------------
+# "Standard" option: working with working directory paths (aka absolute paths)
+  # Check your current working directory
+  getwd()
+  # Set working directory:
+  setwd()
+
+#Q: what happens if you move the project you are working in?
+
+# Why this matters: R looks for files relative to the working directory
+# If you use setwd(), paths become hardcoded and break when you move the folder
+
+# BETTER: Use an R Project (.Rproj file)
+# Opening a .Rproj file automatically sets the working directory to the project root
+# This makes paths portable across computers and enables reproducibility
+
+# With an R Project, use relative paths from the project root:
+# Example: read.csv("data/raw/file.csv")
+# Instead of: setwd("~/Documents/MyProject"); read.csv("data/file.csv")
+
+# Recommended folder structure:
+# project_root/
+# ├── project_name.Rproj
+# ├── data/raw/              (original, never-modified data)
+# ├── data/processed/        (cleaned data)
+# ├── code/                  (R scripts)
+# ├── output/                (figures, tables, results)
+# └── docs/
+
+# Use here() package for safer path construction (handles separators automatically)
+library(here)
+here()  # Shows the project root
+# Then use: read.csv(here("data", "raw", "file.csv"))
 
 
 
