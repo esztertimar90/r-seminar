@@ -145,7 +145,7 @@ save(df, file = paste0(data, 'my_rfile.RData'))
 #   - WDI    - get various data from World Bank's site
 #
 
-# tidyquant
+# tidyquant is a package for financial data use and analysis
 install.packages('tidyquant')
 library(tidyquant)
 # Apple stock prices from Yahoo
@@ -168,6 +168,12 @@ a <- WDIsearch('gdp.*capita.*constant')
 gdp_data <- WDI(indicator='NY.GDP.PCAP.PP.KD', country='all', start=2019, end=2019)
 
 glimpse(gdp_data)
+
+# Eurostat also has an API which might be useful for project work in future courses
+install.packages("eurostat")
+library(eurostat)
+
+# Claude: please complete the Eurostat example with opening poverty data from Eurostat and drawing a simple ggplot for average poverty rates in the EU-27 over time. 
 
 ##
 # Tasks:
