@@ -193,24 +193,22 @@ unique(poverty_raw$sex)
 
 # we only want: the total population (not broken down by age or sex),
 # and only EU-27 member states (dropping EU/EA aggregate rows and non-EU countries)
-eu27 <- c("BE","BG","CZ","DK","DE","EE","IE","EL","ES","FR","HR","IT",
-          "CY","LV","LT","LU","HU","MT","NL","AT","PL","PT","RO","SI",
-          "SK","FI","SE")
+v4 <- c("CZ","HU","PL","SK")
 
-poverty_eu27 <- poverty_raw |>
-  filter(age == "TOTAL", sex == "T", geo %in% eu27)
+poverty_v4 <- poverty_raw |>
+  filter(age == "TOTAL", sex == "T", geo %in% v4)
 
 # average at-risk-of-poverty rate across the EU-27, for each year
-poverty_avg <- poverty_eu27 |>
-  group_by(time) |>
+poverty_avg <- poverty_v4 |>
+  group_by(TIME_PERIOD) |>
   summarise(avg_poverty_rate = mean(values, na.rm = TRUE))
 
 # simple ggplot: EU-27 average poverty rate over time
-ggplot(poverty_avg, aes(x = time, y = avg_poverty_rate)) +
-  geom_line(color = "darkred", linewidth = 1) +
-  geom_point(color = "darkred") +
+ggplot(poverty_avg, aes(x = TIME_PERIOD, y = avg_poverty_rate)) +
+  geom_line(color = "pink", linewidth = 1) +
+  geom_point(color = "pink") +
   labs(
-    title = "At-risk-of-poverty rate, EU-27 average",
+    title = "At-risk-of-poverty rate, Visegrad-4 average",
     subtitle = "Unweighted average across member states, total population",
     x = "Year",
     y = "At-risk-of-poverty rate (%)"
