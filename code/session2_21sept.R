@@ -173,7 +173,49 @@ glimpse(gdp_data)
 install.packages("eurostat")
 library(eurostat)
 
-# Claude: please complete the Eurostat example with opening poverty data from Eurostat and drawing a simple ggplot for average poverty rates in the EU-27 over time. 
+## Example: at-risk-of-poverty rate in the EU-27, over time --------------------
+# Eurostat organizes data into 'tables', each with its own short code.
+# You can search for tables by keyword:
+poverty_search <- search_eurostat("poverty", type = "table")
+head(poverty_search)
+
+# We'll use 'ilc_li02' - the at-risk-of-poverty rate by age and sex
+# (share of people living on less than 60% of national median income)
+poverty_raw <- get_eurostat("ilc_li02", time_format = "num")
+
+# quick check on what we got
+glimpse(poverty_raw)
+
+# Eurostat data comes in 'long' format with its own codes for the breakdowns.
+# Let's see what values these can take:
+unique(poverty_raw$age)
+unique(poverty_raw$sex)
+
+# we only want: the total population (not broken down by age or sex),
+# and only EU-27 member states (dropping EU/EA aggregate rows and non-EU countries)
+eu27 <- c("BE","BG","CZ","DK","DE","EE","IE","EL","ES","FR","HR","IT",
+          "CY","LV","LT","LU","HU","MT","NL","AT","PL","PT","RO","SI",
+          "SK","FI","SE")
+
+poverty_eu27 <- poverty_raw |>
+  filter(age == "TOTAL", sex == "T", geo %in% eu27)
+
+# average at-risk-of-poverty rate across the EU-27, for each year
+poverty_avg <- poverty_eu27 |>
+  group_by(time) |>
+  summarise(avg_poverty_rate = mean(values, na.rm = TRUE))
+
+# simple ggplot: EU-27 average poverty rate over time
+ggplot(poverty_avg, aes(x = time, y = avg_poverty_rate)) +
+  geom_line(color = "darkred", linewidth = 1) +
+  geom_point(color = "darkred") +
+  labs(
+    title = "At-risk-of-poverty rate, EU-27 average",
+    subtitle = "Unweighted average across member states, total population",
+    x = "Year",
+    y = "At-risk-of-poverty rate (%)"
+  ) +
+  theme_minimal()
 
 ##
 # Tasks:
