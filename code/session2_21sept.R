@@ -91,25 +91,21 @@ library(writexl)
 #   2) Import by defining your path:
 #       a) use an absolute path (you have to know from root folder the path of your csv)
 
-data_in <- '~/Documents/Egyetem/Bekes_Kezdi_Textbook/da-coding-rstats/lecture02-data-imp_n_exp/data/hotels_vienna/'
-df_0      <- read_csv(paste0(data_in,'clean/hotels-vienna.csv'))
+df_a <- read_csv('/Users/esztertimar/Teaching/Econometrics R Seminar 2026-27/data/hotels-vienna.csv')
 
 #       b) use relative path:
-#           R works in a specific folder called `working directory`, that you can check by:
+#           check working directory:
 getwd()
 
-# after that, you can set your working directory by:
-setwd(data_in)
-# and simply call the data
-df_1      <- read_csv('clean/hotels-vienna.csv')
-
+# and simply call the data from there:
+df_b      <- read_csv('data/hotels-vienna.csv')
 
 # delete your data
-rm(hotels_vienna, df_0, df_1)
+rm(df_a, df_b)
 
 
 ########
-#   3) Import by using url - this is going to be our preferred method at this course!
+#   3) Import by using url
 #     Note: importing from the web is almost inferior to use your local disc, 
 #       but there are some exceptions:
 #         a) The data is considerably large (>1GB)
@@ -119,7 +115,6 @@ rm(hotels_vienna, df_0, df_1)
 # Can access (almost) all the dat from 'ISF'
 # the hotels vienna dataset has the following url:
 df <- read_csv(url('https://osf.io/y6jvb/download')) 
-
 
 ###
 # Quick check on the data:
@@ -133,24 +128,19 @@ head(df)
 # Have a built in summary for the variables
 summary(df)
 
-
+data <- '/Users/esztertimar/Teaching/Econometrics R Seminar 2026-27/data/'
 ###########################
 # Exporting your data:
-#
-# This is a special case: data_out is now the same as data_in (no cleaning...)
-data_out <- paste0(data_in, '/export/')
-write_csv(df, paste0(data_out, 'my_csvfile.csv'))
+write_csv(df, paste0(data, 'my_csvfile.csv'))
 
 # If due to some reason you would like to export as xls(x)
-install.packages('writexl')
-library(writexl)
-write_xlsx(df, paste0(data_out, 'my_csvfile.xlsx'))
+write_xlsx(df, paste0(data, 'my_csvfile.xlsx'))
 
 # Third option is to save as an R object
-save(df, file = paste0(data_out, 'my_rfile.RData'))
+save(df, file = paste0(data, 'my_rfile.RData'))
 
 ######
-# Extra: using API
+# Extra: using API (short for Application Programming Interface) 
 #   - tq_get - get stock prices from Yahoo/Google/FRED/Quandl, ect.
 #   - WDI    - get various data from World Bank's site
 #
