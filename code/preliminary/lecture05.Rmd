@@ -1,0 +1,271 @@
+---
+title: "RMarkdown introduction"
+output: html_document
+---
+
+Provides an unified authoring framework for data science, combining your code, its results, and your prose commentary. R Markdown documents are fully reproducible and support dozens of output formats, like PDFs, Word files, slideshows, and more.
+
+In more details:
+
+-   <https://r4ds.had.co.nz/r-markdown.html>
+-   <https://bookdown.org/yihui/rmarkdown-cookbook/>
+
+## Markdown language
+
+Unordered list
+
+- item 1
+- item 2
+
+Ordered list
+
+1. first item 
+2. second item
+
+**Bold**
+
+*italic*
+
+***bold italic***
+
+Mathematical expressions:
+
+$$
+\mu =  \frac{\sum x_{i}}{N} 
+$$
+
+
+## Code Chunks
+
+Surround code chunks with ```` ```{r ...} ```` and ```` ``` ````. Add a chunk label and/or chunk options inside the curly braces after `r`. Use `` ` code ` `` to put inline code in the text.
+
+```{r setup, include = FALSE}
+# load libraries
+library(tidyverse)
+library(wooldridge)
+library(stargazer)
+library(viridis)
+```
+
+### Chunk Options
+
+Options control whether a chunk is executed and how its output is displayed.
+
+#### no options
+```{r nooptions}
+head(wage1)
+```
+
+#### `echo = FALSE`
+```{r options echo, echo = FALSE}
+head(wage1)
+```
+
+#### `eval = FALSE`
+```{r options eval, eval = FALSE}
+head(wage1)
+```
+
+#### `include = FALSE`
+```{r options include, include = FALSE}
+head(wage1)
+```
+
+----
+
+## Introduction
+
+This is a report on Hotel prices in Vienna in 2017. You want to understand the connection between hotel prices and guest ratings.
+
+## Data
+
+We use a dataset containing hotel prices and features across 46 European cities for ten different dates. The data were cleaned and filtered to include only hotels in Vienna in 2017.
+
+```{r data import, include = FALSE}
+# set working directory
+setwd('/Users/martinneubrandt/Dropbox/GitHub/corvinus_econometrics')
+
+# load dataset
+hotels <- read_csv('data/hotels_vienna/hotels_vienna_main.csv')
+
+# create factors
+hotels$starrating <- factor(hotels$starrating)
+
+```
+
+```{r data info, echo = FALSE}
+glimpse(hotels)
+head(hotels)
+```
+
+## Descriptives
+
+```{r price distribution, echo = FALSE}
+# create a fancy plot about the distribution of prices
+# put the mean and the median on the plot
+hotels |> 
+  ggplot(aes(x = price_per_night)) +
+  geom_histogram(binwidth = 20,
+                 aes(fill = after_stat(x)), # you have to use after_stat(x), because you need the "computed statistics" based on the x variable, not the raw x variable
+                 color = 'black') +
+  scale_fill_viridis() +
+  geom_vline(aes(xintercept = mean(price_per_night)),
+             color = 'blue',
+             linetype = 'dashed',
+             linewidth = 1) + # add mean
+  geom_vline(aes(xintercept = median(price_per_night)),
+             color = 'red',
+             linetype = 'dashed',
+             linewidth = 1) + # add median
+  labs(title = 'Distribution of hotel prices',
+       x = 'Price per night (EUR)',
+       y = 'Number of hotels',
+       fill = 'Price') +
+  theme_classic() +
+  theme(text = element_text(size = 16)) + # change the text size in the theme settings
+  annotate('text',
+           x = 170, y = 50,
+           label = paste0('Mean: ', round(mean(hotels$price_per_night), 2)),
+           color = 'blue',
+           size = 5) + # add mean label
+  annotate('text',
+           x = 155, y = 35,
+           label = paste0('Median: ', round(median(hotels$price_per_night), 2)),
+           color = 'red',
+           size = 5) + # add median label
+  theme(legend.position = 'none') # remove legend
+
+```
+
+What's the connection between hotel prices and ratings?
+```{r scatterplot price by ratings, echo = FALSE}
+hotels |> 
+  ggplot(aes(x = factor(ratings),
+             y = price_per_night)) +
+  geom_jitter() +
+  labs(title = 'Hotel prices by rating',
+       x = 'Guest rating (out of 5)',
+       y = 'Price per night (EUR)',
+       fill = '') +
+  theme_classic() + # set the "basic" theme settings
+  scale_fill_viridis(discrete = TRUE) + # set new colour filling palette
+  theme(legend.position = 'none') + # remove legend
+  theme(text = element_text(size = 16)) # change the text size in the theme settings
+
+```
+
+What's the connection between hotel prices and stars?
+```{r price boxplot by stars, echo = FALSE}
+hotels |> 
+  ggplot(aes(x = factor(starrating),
+             y = price_per_night,
+             fill = factor(starrating))) +
+  geom_boxplot() +
+  labs(title = 'Hotel prices by stars',
+       x = 'Stars',
+       y = 'Price per night (EUR)',
+       fill = '') +
+  theme_classic() + # set the "basic" theme settings
+  scale_fill_viridis(discrete = TRUE) + # set new colour filling palette
+  theme(legend.position = 'none') + # remove legend
+  theme(text = element_text(size = 16)) # change the text size in the theme settings
+
+```
+
+```{r ratings boxplot by stars, echo = FALSE}
+hotels |> 
+  ggplot(aes(x = factor(starrating),
+             y = ratings,
+             fill = factor(starrating))) +
+  geom_boxplot() +
+  labs(title = 'Guest ratings by stars',
+       x = 'Stars',
+       y = 'Guest rating (out of 5)',
+       fill = '') +
+  theme_classic() + # set the "basic" theme settings
+  scale_fill_viridis(discrete = TRUE) + # set new colour filling palette
+  theme(legend.position = 'none') + # remove legend
+  theme(text = element_text(size = 16)) # change the text size in the theme settings
+```
+
+```{r distribution of distance, echo = FALSE}
+# The greater the distance from the city centre, the more negative the value
+# make a fancy plot about the distribution of the distance
+# use the viridis color palette to fill the columns
+# so the farther the column, the darker the color
+hotels |> 
+  ggplot(aes(x = distance)) +
+  geom_histogram(bins = 30,
+                 aes(fill = after_stat(x)), # you have to use after_stat(), because you need the "computed statistics based on the x variable, not the raw x variable
+                 color = 'black') +
+  scale_fill_viridis() +
+  labs(title = 'Distribution of distance from city centre',
+       x = 'Distance from city centre (miles)',
+       y = 'Number of hotels',
+       fill = 'Distance') +
+  theme_classic() +
+  theme(legend.position = 'none') + # remove legend
+  theme(text = element_text(size = 16)) # change the text size in the theme settings
+
+```
+
+```{r all together plot, echo = FALSE}
+# create a fancy plot about prices, distance, quest rating and stars
+hotels |> 
+  filter(distance>-10) |> 
+  ggplot(aes(x = distance,
+             y = price_per_night,
+             shape = starrating,
+             color = ratings)) +
+  geom_jitter(size = 4,
+              alpha = 0.75) +
+  labs(title = 'Hotel prices by distance, stars, and ratings',
+       x = 'Distance from city centre (miles)',
+       y = 'Price per night (EUR)',
+       shape = 'Stars',
+       color = 'Guest rating') +
+  theme_classic() + # set the "basic" theme settings
+  scale_color_viridis() + # set new colour filling palette
+  theme(text = element_text(size = 16)) # change the text size in the theme settings
+
+```
+
+
+## Regression
+
+Run the following regression:
+
+$$
+ln(Price_{i}) = \beta_{0} + \beta_{1} ratings_{i} + \beta_{2} stars_{i} + \beta_{3} distance_{i} + \varepsilon_{i}
+$$
+
+```{r simple regression, echo = FALSE, message = FALSE}
+# regress hotel prices on distance, stars, ratings, and offer dummy
+model_base <- lm(log(price_per_night) ~ ratings,
+             data = hotels)
+model_stars <- lm(log(price_per_night) ~ ratings + starrating,
+             data = hotels)
+model_full <- lm(log(price_per_night) ~ ratings + starrating + distance,
+             data = hotels)
+
+# create regression output table using stargazer
+stargazer(model_base,
+          model_stars,
+          model_full,
+          type = 'text',
+          title = 'Regression results',
+          dep.var.labels = c('Log of price per night (EUR)'),
+          covariate.labels = c('Guest rating (out of 5)',
+                               '4 stars',
+                               '5 stars',
+                               'Distance (miles)'),
+          no.space = TRUE,
+          omit.stat = c('f', 'ser'),
+          digits = 3,
+          notes = c('Standard errors in parentheses')
+)
+
+```
+
+
+
