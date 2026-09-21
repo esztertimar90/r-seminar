@@ -1,9 +1,6 @@
 ########## R CODING SEMINAR (ECONOMETRICS) #########
 # SESSION 2: ORGANIZING YOUR WORK, IMPORTING DATA #
 ## ---------------------------------------------- ##
-
-## Housekeeping ----------------------------------------------------------------
-# Use this only if you want to reset the workspace
 rm(list = ls())
 
 ## Packages/libraries ----------------------------------------------------------
@@ -37,7 +34,7 @@ ggsave("graphs/myplot.png")
 # Why this matters: R looks for files relative to the working directory
 # If you use setwd(), paths become hardcoded and you need to update it when you move the folder
 
-# BETTER: Use an R Project (.Rproj file)
+# Alternative: Use an R Project (.Rproj file)
 # Opening a .Rproj file automatically sets the working directory to the project root
 # This makes paths portable across computers and enables reproducibility
 
@@ -103,6 +100,13 @@ df_b      <- read_csv('data/hotels-vienna.csv')
 # delete your data
 rm(df_a, df_b)
 
+# the commands above assume that the first row is column names, the separator is a comma, and NAs are coded as empty cells 
+# data is not always this neat: you can tweak the read command to your needs, e.g.:
+ df <- read_csv('data/hotels-vienna.csv', col_names = FALSE,
+          na = c("", "NA", "missing"), skip = 1, locale = locale(decimal_mark = ","))
+glimpse(df)
+
+# Q: what are the differences between the two dataframes? Why do you think they are different?
 
 ########
 #   3) Import by using url
@@ -112,7 +116,7 @@ rm(df_a, df_b)
 #         b) It is important that there is no `refresh` or change in the data
 #       in these case it is good practice to download to your computer the datas
 
-# Can access (almost) all the dat from 'ISF'
+# Can access (almost) all the data from 'OSF'
 # the hotels vienna dataset has the following url:
 df <- read_csv(url('https://osf.io/y6jvb/download')) 
 
@@ -203,6 +207,8 @@ poverty_avg <- poverty_v4 |>
   group_by(TIME_PERIOD) |>
   summarise(avg_poverty_rate = mean(values, na.rm = TRUE))
 
+    #note: |> (or %>%) is the pipe operator, chains multiple operations together ("and then")
+
 # simple ggplot: EU-27 average poverty rate over time
 ggplot(poverty_avg, aes(x = TIME_PERIOD, y = avg_poverty_rate)) +
   geom_line(color = "pink", linewidth = 1) +
@@ -216,32 +222,25 @@ ggplot(poverty_avg, aes(x = TIME_PERIOD, y = avg_poverty_rate)) +
   theme_minimal()
 
 ##
-# Tasks:
+# Homework practice:
 #
 # 1) Go to the webpage: https://gabors-data-analysis.com/ and find OSF database under `Data and Code`
 # 2) Go the the Gabor's OSF database and download manually 
 #       the `hotelbookingdata.csv` from `hotels-europe` dataset into your computer and save it to 'raw' folder.
 # 3) load the data from this path
 # 4) also load the data directly from the web (note you need to add `/download` to the url)
-# 5) write out this file as xlsx and as a .RData next to the original data.
-
-# Load from path
-df_t0 <- read_csv(paste0(data_in,'raw/hotelbookingdata.csv'))
-# Load from wed
-df_t1 <- read_csv('https://osf.io/yzntm/download')
-# Write as xlsx
-write_xlsx(df_t1, paste0(data_out, 'hotelbookingdata.xlsx'))
-# Write as .RData
-save(df_t1, file = paste0(data_out, 'hotelbookingdata.RData'))
+# 5) write out this file as xlsx and save it next to the original data.
 
 
-
-
-
-
+################################################################################
 ## 3) Tibbles ------------------------------------------------------------------
-# in tidyverse data objects are stored in 'tibble' format
-# tibble is a special 'Data' type of variable
+################################################################################
+# In tidyverse, data is stored in 'tibble':
+#   this creates a special 'Data' type of variable:
+#     it consists: rows    = observations
+#                  columns = variables
+# --> this is also called 'long' format data
+rm(list = ls())
 
 # create a tibble
 workers <- tibble(
@@ -268,16 +267,13 @@ workers$wage
 workers[1, 1]
 workers[[1, 1]]
 
-  # difference between single and double square brackets
-  typeof(workers[1, 1])  # returns list
-  typeof(workers[[1, 1]])  # returns double vector
-
 # select elements
 workers[1:3, 1:2]  # first three rows, first two columns
 workers[1:3, c('name', 'age')]  # first three rows, name and age columns
 workers$wage[1:3]  # first three rows, wage column
 workers[workers$male == FALSE, ] # females
 workers[workers$age >= 20 & workers$age <= 40, ] # workers between 20-40 years old
+young <- workers[workers$age >= 20 & workers$age <= 40, ] # save the subset to a new tibble called 'young'
 
 # using built-in functions
 filter(.data = workers, male == FALSE) # same but with built-in function
@@ -292,63 +288,84 @@ select(.data = workers, wage)
 sum(workers$wage) # problem: NAs
 sum(workers$wage, na.rm = TRUE) # how to deal with NAs
 
-# average wage of workers between 20-40 years old
+# Usually, we are interested in some characteristics of the data.
+# --> we can use functions on our tibbles
+# What is the average wage of workers?
+mean(workers$wage)
+mean(workers$wage, na.rm=TRUE)
+
+#Q: What do the following functions give us?
 mean(workers$wage[workers$age >= 20 & workers$age <= 40], na.rm = TRUE)
+mean(workers$wage[workers$male == TRUE], na.rm = TRUE)
 
-## 3) the pipe operator --------------------------------------------------------
-# the pipe operator is used to chain functions together
+# we can also filter out observations we do not need
+workers_female <- filter(.data = workers, male == FALSE)
+workers_rich <- filter(.data = workers, wage > 100000)
+workers_rich
 
-# e.g.: you can do the same with the pipe operator as with the indexing and subsetting before
-# select name and age variables
-workers |>
-  select(name, age)
+#Task:
+# calculate the average wage of female workers taller than 1.6 m and older than 30 years old 
+# save it as an object called `avg_wage` and print it to the console
 
-# select females
-workers |>
-  filter(male == FALSE)
 
-# select wages of female workers
-workers |>
-  filter(male == FALSE) |>
-  select(wage)
+## Resetting values, adding rows or columns
+# In some cases you want to re-set/re-define certain values, due to:
+#   1) error in data
+#   2) imputing data
 
-# select wages of female workers between 20-40 years old
-workers |>
-  filter(male == FALSE) |>
-  filter(age >= 20 & age <= 40) |>
-  select(wage)
+# Lets assume that one of the workers, named Alice, has a wrong age in the data.
+# It is easy to correct this mistake, by:
+workers$age[ workers$name == 'Alice' ] <- 41
 
-workers |>
-  filter(male == FALSE & age >= 20 & age <= 40) |>
-  select(wage)
+##
+# Add columns
+# Next let us add a new variable: an ID number to our workers
+id <- c(1, 2, 3, 4, 5)
+# but this is now not part of our 'workers' tibble. We can add it in two ways:
 
-# average wage of workers between 30-40 years old
-workers |>
-  filter(age >= 30 & age <= 40) |>
-  summarise(avg_wage = mean(wage, na.rm = TRUE))
+# 1) The simplest is to define a new variable:
+workers$id <- id
 
-# add a new variable
-workers <- workers |>
-  add_column(firm = c('Microsoft', 'Google', NA ,'Amazon', 'Apple')) # tidyverse thinking
+# this is easy, but has the disadvantage of rewriting the `id` variable if it is already defined 
+#   without any warning.
+# 2) `add_column()` function recommended by tidyverse, and it will result in error if there is any problem
+# e.g. the following will result in an error, as it is already exists
+add_column(workers, id = id)
+# but with 'new' you can add it to our tibble.
+workers <- add_column(workers, id_new = id)
 
-workers <- workers |>
-  mutate(heightsq = height*height) # create new variable using already defined variable
+# to remove a variable, we will use the `select()` function with a negation. 
+#   This can be seen as a quasy-logical operation:
+workers <- select(workers, -id_new)
 
-# change values
-workers <- workers |>
-  mutate(wage = replace_na(wage, 0)) # change NA to zero
+# Later we will discuss `select()` function more in details.
 
-workers <- workers |>
-  mutate(age = replace(age, age > 30, 31))
+##
+# Add rows
+# To add a new observation or row, you can use `add_row()` function from tidyverse:
+workers <- add_row(workers, id = 6, age = 25, name = "John", male = TRUE, height = 1.75, wage = 50000)
+workers
+# Note: if variable is not supplied as input, it will be NA. 
+#   Furthermore you can specify where to add the row with `.before = ` input command.
+#   Adding multiple rows is possible, but not recommended because it's a bit hard to read
 
-# remove a variable
-workers <- workers |>
-  select(-heightsq)
+# Removing rows can be done via indexing. E.g. removing the added observation with id==6:
+workers <- workers[workers$id != 6, ]
 
-# add a new observation (row)
-workers <- workers |>
-  add_row(name = 'Frank', age = 61, height = 179, wage = 30000, male = TRUE, firm = 'Tesla')
+# Note that here coma and empty space is crucial otherwise it does not work.
+# Again in the data munging we will discuss it more in detail.
 
-# remove observations
-workers <- workers |>
-  filter(wage > 0) # remove observations with zero wage (or keep observations with greater than zero wage)
+
+
+
+
+
+
+
+
+
+#### Task solutions:
+
+# average wage of female workers taller than 1.6 m and older than 30:
+avg_wage <- mean(workers$wage[workers$male == FALSE & workers$height > 1.6 & workers$age > 30], na.rm = TRUE)
+avg_wage
