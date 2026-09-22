@@ -71,7 +71,6 @@ library(writexl)
 ## Importing data:
 # 3 options to import data:
 
-
 #####
 #   1) Import by clicking: File -> Import Dataset -> 
 #       -> From Text (readr) / this is for csv. You may use other to import other specific formats
