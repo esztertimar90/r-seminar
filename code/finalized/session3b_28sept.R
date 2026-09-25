@@ -195,14 +195,22 @@ hotels_main <- filter(hotels,
                       price_per_night < 500,
                       starrating >= 3)
 
-view(hotels_main)
-
 # Step 2: remove variables that are now the same for every row
 hotels_main <- select(hotels_main, -year, -month, -weekend, -acc_type)
 
-# Step 4: sort from best to worst 
+# Step 3: sort from best to worst 
 hotels_main <- arrange(hotels_main, price_per_night, desc(ratings), desc(starrating), distance)
-view(hotels_main)
+
+# We can do all of this as piped commands with the |> operator as follows:
+hotels_main <- hotels |>
+  filter(year == 2017,
+         month == 11,
+         weekend == 0,
+         acc_type == 'Hotel',
+         price_per_night < 500,
+         starrating >= 3) |>
+  select(-year, -month, -weekend, -acc_type) |>
+  arrange(price_per_night, desc(ratings), desc(starrating), distance)
 
 # Save the main sample in a csv
 write_csv(hotels_main, 'data/hotels_amsterdam_main.csv')
