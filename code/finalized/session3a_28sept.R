@@ -8,15 +8,13 @@ rm(list = ls())
 
 ## packages/libraries ----------------------------------------------------------
 # load packages
-install.packages("tidyverse")
+#install.packages("tidyverse")
 library(tidyverse)
 
 ## 1) case study: football managers --------------------------------------------
 # story: managers with more experience (games) have more points?
 # points: win (3), draw (1), lose (0)
 # long/wide format and data merging
-# clean the environment
-rm(list = ls())
 
 # working directory, paths
 getwd() # your working directory: this is where you are "standing" in your folder structure
