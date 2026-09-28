@@ -128,7 +128,7 @@ football <- football |>
           arrange(-avg_points)
 summary(football$avg_points)
 
-view(football)
+head(football)
 
 ggplot(manager_avg, aes(x = reorder(manager_id, avg_points), y = avg_points)) +
   geom_col(fill = 'steelblue') +

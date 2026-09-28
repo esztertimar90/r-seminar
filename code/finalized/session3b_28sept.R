@@ -22,8 +22,35 @@ getwd()
 
 # we will learn how to clean and prep data while trying to find a good deal among hotels
 
+# First, let's learn the 'mutate' function on made-up hotel data:
+prices <- tibble(hotel = c("A", "B", "C"),
+                 price = c(100, 150, 80),
+                 nights = c(1, 2, 1))
+prices
+
+mutate(prices, price_per_night = price / nights)
+prices
+
+# a new column from a constant
+prices <- mutate(prices, currency = "EUR")
+prices
+
+# overwrite an existing column: same name on the left
+prices <- mutate(prices, price = price * 1.1)
+prices
+
+# several columns at once, and a later one can use an earlier one
+prices <- mutate(prices,
+                 price_huf = price * 360,
+                 expensive = price_huf > 50000)
+prices
+
+# a condition
+prices <- mutate(prices, category = ifelse(price > 100, "high", "low"))
+rm(prices)
+
 ## 1) case study: hotels  ------------------------------------------------------
-# story: You want to analyse hotels in Vienna, Austria
+# story: You want to analyse hotels in Amsterdam to find the best deal
 # import raw data: hotels-europe
 # includes information on price and features of hotels in 46 European cities and for 10 different dates
 raw_df <- read_csv('https://osf.io/yzntm/download')
@@ -42,8 +69,11 @@ unique(raw_df$city_actual)
 n_distinct(raw_df$city_actual)  # there are 760 cities
 
 # often, we do not need all the information from a dataset
-# we can delete the variables (aka columns) we do not need
 # create a new dataset and keep only the relevant content:
+
+    # filter() is for rows: we only keep rows where s_city is Amsterdam
+    # select() is for columns: we keep the hotel characteristics we care about
+
 hotels <- raw_df |> 
   filter(s_city == 'Amsterdam') |> 
   select(center1distance,
@@ -55,8 +85,6 @@ hotels <- raw_df |>
          offer, offer_cat,
          year, month, weekend, holiday)
 
-    # filter() is for rows: we only keep rows where s_city is Amsterdam
-    # select() is for columns: we keep the hotel characteristics we care about
 
 view(raw_df)
 view(hotels)
@@ -84,9 +112,9 @@ hotels <- hotels |>
   mutate(
     nights = as.numeric(
       gsub(
-        pattern = '[^0-9]',
-        x = price_night,
-        replacement = '')))
+        pattern = '[^0-9]',      # means: any character that is not a digit 0-9
+        x = price_night,         # means: in the variable price_night
+        replacement = '')))      # means: replace it with empty character
       
         # we have a new variable 'nights' which extracted the number of nights
 
