@@ -8,9 +8,10 @@ rm(list = ls())
 
 ## packages/libraries ----------------------------------------------------------
 # install packages
-install.packages('writexl')
-install.packages('tidyverse')
-install.packages('dplyr')
+
+#install.packages('writexl')
+#install.packages('tidyverse')
+#install.packages('dplyr')
 
 # load packages
 library(writexl)
@@ -48,6 +49,10 @@ prices
 # a condition
 prices <- mutate(prices, category = ifelse(price > 100, "high", "low"))
 rm(prices)
+
+mutate(hotels, stars = factor(stars))                  # categorical variable
+mutate(hotels, nights = as.numeric(nights))            # text to number
+mutate(hotels, nights = parse_number(price_night))     # number taken out of text
 
 ## 1) case study: hotels  ------------------------------------------------------
 # story: You want to analyse hotels in Amsterdam to find the best deal
@@ -93,28 +98,15 @@ view(hotels)
 rm(raw_df)
 
 ## 2) data cleaning ----------------------------------------------------------------
-#--------------------------------------------------------------------------------
-# we will use mutate function with gsub and regex
-# mutate: tidyverse function to create new vars as 'mutations' of existing ones
-# gsub: search for matches in the data for a pattern and replace it with something
-# regular expression (regex): a formal language used to describe patterns in text
-#   - we have to put into string quotes
-#   - []: match any character from this set
-#   - ^: negation, so match any character, except in the set
-#   - 0-9: any digit from 0 to 9
-#---------------------------------------------------------------------------------
-
 # Problem 1: prices are not in 'per night' format, we have price and the amount of nights
 # Solution: We need to create a price per night variable 
 
+glimpse(hotels$price_night)
+glimpse(hotels$price)
+
 # Step 1: we extract the number of nights from 'price_night' string
 hotels <- hotels |> 
-  mutate(
-    nights = as.numeric(
-      gsub(
-        pattern = '[^0-9]',      # means: any character that is not a digit 0-9
-        x = price_night,         # means: in the variable price_night
-        replacement = '')))      # means: replace it with empty character
+  mutate(nights = parse_number(price_night))   # takes the first number out of the text
       
         # we have a new variable 'nights' which extracted the number of nights
 
