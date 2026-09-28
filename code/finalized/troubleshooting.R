@@ -12,3 +12,9 @@ file.access(getwd(), 2)         # can you save files there?
 nrow(available.packages())      # can R reach CRAN? (thousands = yes)
 readLines("https://raw.githubusercontent.com/gabors-data-analysis/da-coding-rstats/main/lecture03-tibbles/data/games.csv", n = 2)
 readLines("https://osf.io/download/p6tyr/", n = 2)
+
+# 4. Other issues
+sessionInfo()           # R version, operating system, loaded packages and versions, all at once
+.libPaths()             # where packages are installed
+traceback()             # right after an error: which function it actually came from
+conflicts()             # functions with the same name in several packages
