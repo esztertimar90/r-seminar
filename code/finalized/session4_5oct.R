@@ -372,3 +372,4 @@ t.test(bpp$p_diff, mu = 0)
 
 t.test(bpp$price_online, bpp$price, paired = TRUE)
 
+t.test(bpp$price_online, bpp$price)
