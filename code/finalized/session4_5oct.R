@@ -24,7 +24,7 @@ write_csv(bpp_orig, 'data/bpp_orig.csv')
 
 # Check the variables
 glimpse(bpp_orig)
-
+head(bpp_orig)
 ## Create our key variable: price differences
 bpp_orig <- mutate(bpp_orig, p_diff = price_online - price)
 
@@ -164,7 +164,7 @@ ggplot(data = bpp) +
 #   the other possibility is to use relative frequency instead:
 # you need to add `y = after_stat(density)` to the aesthetics:
 ggplot(data = bpp) +
-  geom_histogram(aes( y = after_stat(density), x = price), fill = 'navyblue',
+  geom_histogram(aes( y = after_stat(density), x = price), fill = '#1f77b4', alpha = 0.4,
                   bins = 50) +
   labs(x = 'Price',
        y = 'Relative Frequency')
@@ -185,7 +185,7 @@ my_graph
 
 # Cool stuff about ggplot, is that we can add (later as well) new geometric object to it.
 # e.g. we can add a histogram:
-my_graph + geom_histogram(aes( y = after_stat(density), x = price), fill = 'navyblue', 
+my_graph + geom_histogram(aes( y = after_stat(density), x = price), fill = '#1f77b4', 
                            alpha = 0.4, binwidth = 20)
 # note alpha governs the opaqueness of the object
 
@@ -235,7 +235,6 @@ ggplot(data = bpp, aes(x = p_diff, fill = country_f)) +
 ###
 # Task 2)
 # 1) Do the same, but use geom_density instead of geom_histogram!
-#     You may play around with the xlim!
 # 2) Drop the `facet_wrap` command! What happens? Which graph would you use to tell your story in this case?
 # What if instead of `fill` you use `color`?
 
@@ -346,7 +345,7 @@ write_csv(corr_table, 'output/corr_by_country.csv')
 # 2) Excel - writexl was installed in session 3
 # install.packages('writexl')
 library(writexl)
-writexl::write_xlsx(corr_table, 'output/corr_by_country.xlsx')
+write_xlsx(corr_table, 'output/corr_by_country.xlsx')
 
 # 3) a formatted table straight into Word (or .html / .tex / .md)
 install.packages('pandoc')
@@ -372,7 +371,4 @@ ggsave('graphs/corrgraph.png', corrgraph, width = 6, height = 4, dpi = 300)
 t.test(bpp$p_diff, mu = 0)
 
 t.test(bpp$price_online, bpp$price, paired = TRUE)
-
-# Is this a one-sided or two sided-test? What is the p-value?  
-
 
