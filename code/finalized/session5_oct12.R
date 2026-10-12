@@ -227,3 +227,40 @@ ggplot(diamonds, aes(x = fct_reorder(cut, price), y = price, fill = cut)) +
 
 # Use AI to make your figures nicer and help you with ggplot code. 
 # Student Developer Pack will give you access to GitHub Copilot, which you can integrate into RStudio.
+
+# Create a violin plot for diamond prices by cut
+violin_plot <- ggplot(diamonds, aes(x = cut, y = price, fill = cut)) +
+  geom_violin(trim = TRUE, color = "black") +
+  scale_fill_manual(values = c("Fair" = "#1f77b4", "Good" = "#ff7f0e", "Very Good" = "#2ca02c", "Premium" = "#d62728", "Ideal" = "#9467bd")) +
+  labs(title = "Distribution of Diamond Prices by Cut",
+       x = "Cut",
+       y = "Price") +
+  theme_minimal(base_size = 15) +
+  theme(plot.title = element_text(hjust = 0.5, face = "bold"),
+        axis.title.x = element_text(face = "bold"),
+        axis.title.y = element_text(face = "bold"),
+        legend.position = "none")
+
+# Print the violin plot
+print(violin_plot)
+
+install.packages("ggridges")
+library(ggridges)
+
+library(ggridges)
+
+# Create a ggridges plot for diamond prices by cut
+ridge_plot <- ggplot(diamonds, aes(x = price, y = cut, fill = cut)) +
+  geom_density_ridges(alpha = 0.8, color = "white") +
+  scale_fill_manual(values = c("Fair" = "#1f77b4", "Good" = "#ff7f0e", "Very Good" = "#2ca02c", "Premium" = "#d62728", "Ideal" = "#9467bd")) +
+  labs(title = "Price Distribution of Diamonds by Cut",
+       x = "Price",
+       y = "Cut") +
+  theme_minimal(base_size = 15) +
+  theme(plot.title = element_text(hjust = 0.5, face = "bold"),
+        axis.title.x = element_text(face = "bold"),
+        axis.title.y = element_text(face = "bold"),
+        legend.position = "none")
+
+# Print the ggridges plot
+print(ridge_plot)
