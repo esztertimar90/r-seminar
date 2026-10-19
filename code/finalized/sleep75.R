@@ -4,8 +4,6 @@ rm(list = ls())
 # install.packages("wooldridge")  # run once
 data(sleep75, package = "wooldridge")
 
-set.seed(20261019)
-  # set.seed is optional - it ensures that you get the same sample every time
 train_index <- sample(1:nrow(sleep75), size = 0.8 * nrow(sleep75))
 sleep75train <- sleep75[train_index, ]
 sleep75test <- sleep75[-train_index, ]
@@ -28,8 +26,8 @@ tapply(sleep75train$sleep, list(male = sleep75train$male, yngkid = sleep75train$
 
 # Option 2: make a box plot
 boxplot(sleep ~ male + yngkid, data = sleep75train,
-        names = c("Women,\nno child", "Men,\nno child", "Women,\nyoung child", "Men,\nyoung child"),
         xlab = "", ylab = "Minutes of sleep per week")
+# note: this did not work on the lab computers
 
 # ... or ggplot box plot:
 ggplot(sleep75train, aes(x = factor(male, labels = c("Women", "Men")), y = sleep)) +
@@ -47,7 +45,8 @@ summary(model_int)
 
 # Interpretations: male, youngkid, interaction should be read together.
 # Each should be interpreted as the effect when the others are 0. 
-
+# Interaction: it is the difference in the young-child effect between 
+# men and women. 
 
 # ---- f) Prediction for a 40-year-old full-time man ---------------------------
 
@@ -60,9 +59,10 @@ predict(model_int, new, interval = "prediction", level = 0.90) / 60
 
 # ---- g) Test RMSE ------------------------------------------------------------
 
-sqrt(mean((sleep75test$sleep - predict(model,     sleep75test))^2))
+sqrt(mean((sleep75test$sleep - predict(model1,     sleep75test))^2))
 sqrt(mean((sleep75test$sleep - predict(model_int, sleep75test))^2))
 
 # ---- h) BIC ------------------------------------------------------------------
 
-BIC(model, model_int)
+BIC(model1, model_int)
+
